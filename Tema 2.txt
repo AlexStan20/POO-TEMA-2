@@ -1,0 +1,374 @@
+#include <iostream>
+#include <string.h>
+using namespace std;
+
+
+class nod{
+    char* info;
+    nod* next;
+public:   
+    nod(){
+       info=new char[8];
+       strcpy(info,"Sir vid");
+       next=NULL;
+    }
+    nod(char* x,nod* n){
+        info=x;
+        next=n;
+    }
+    nod(const nod &obj){
+       info=obj.info;
+       next=obj.next;
+    }
+    ~nod(){}
+    void setinfo(char* i){
+        info=i;
+    }    
+    void setnext(nod* n){
+        next=n;
+    }
+    char* getinfo(){
+        return info;
+    }
+    nod* getnext(){
+        return next;
+    }
+    friend std::ostream& operator << (std::ostream&, const nod&);
+    friend std::istream& operator >> (std::istream&,nod&);
+    nod operator =(nod n);
+    friend class coada;
+    friend class deque;
+    friend class deque_marcaj;
+};
+ostream& operator<<(ostream& out, const nod&x){
+    out<<x.info<<endl;
+    out<<x.next;
+    return out;
+}
+istream& operator>>(istream& in, nod&x){
+    x.info=new char[10];
+    in>>x.info;
+    in>>*x.next;
+    return in;
+}
+nod nod::operator =(nod n){
+    nod m;
+    m.info=n.info;
+    m.next=n.next;
+    return m;
+}
+class coada{
+protected:
+    int dim_max;
+    int size;
+    nod* prim;
+    nod* ultim;
+public:
+    coada(){
+       dim_max=0;
+       size=0;
+       prim=NULL;
+       ultim=NULL;
+    }
+    coada(int i,nod* n){
+       dim_max=i;
+       size=1;
+       prim=n;
+       ultim=n;
+    }
+    coada(int i,nod* n,nod* m){
+       dim_max=i;
+       size=2;
+       prim=n;
+       ultim=m;
+    }
+    coada(const coada &obj){
+       prim=NULL;
+       ultim=NULL;
+       size=0;
+       dim_max=obj.dim_max;
+       nod* p=obj.prim;
+       while(p!=NULL)
+            {insert(p->getinfo());
+            p=p->getnext();}
+    }
+    ~coada(){}
+    void insert(char* x){
+        try{
+            if(size==dim_max)
+                throw 4;
+            nod *Y;
+            Y=new nod(x,NULL);
+            ultim->setnext(Y);
+            ultim=Y;
+            size++;
+        }
+        catch(int i){
+            cout<<"Exceptie "<<i<<":A fost atinsa limita de alocare.Nu mai poti insera";
+        }
+    }
+    nod top(){
+        try{
+            if(prim==NULL)
+                throw 1;
+            return *prim;    
+        }
+        catch(int i){
+            cout<<"Exceptie "<<i<<":Primul element nu exista";
+        }
+    }
+    void pop(){
+        try{
+            if(prim==NULL)
+                throw 1;
+            delete prim;
+            if(prim->getnext()!=NULL)
+                prim=prim->getnext();
+        }
+        catch(int i){
+            cout<<"Exceptie "<<i<<":Primul element nu exista";
+        }
+    }
+    void empty(){
+        dim_max=0;
+        size=0;
+    }
+    friend std::ostream& operator << (std::ostream&, const coada&);
+    friend std::istream& operator >> (std::istream&,coada&);
+    coada operator =(coada c);
+};
+ostream& operator<<(ostream& out,const coada&x){
+    if(x.dim_max!=0)
+        {nod* c=x.prim;
+        while(c!=x.ultim)
+            {out<<c->getinfo();
+            c=c->getnext();
+            if(c==x.ultim)    
+                out<<c->getinfo();}    
+        return out;}
+}
+istream& operator>>(istream& in,coada&x){
+    in>>x.dim_max;
+    in>>x.size;
+    if(x.size!=0)
+        {in>>*x.prim;
+        nod* c=x.prim;
+        for(int i=2;i<x.size;i++)
+            {in>>*c->getnext();
+            c=c->getnext();}    
+        in>>*x.ultim;
+        return in;}
+}
+coada coada::operator =(coada c){
+    coada e(c.dim_max,c.prim);
+    nod *n;
+    e.dim_max=c.dim_max;
+    e.size=c.size;
+    if(c.prim->getnext()!=NULL)
+        n=c.prim->getnext();
+    while(n!=c.ultim){
+        e.insert(n->getinfo());
+        n=n->getnext();
+    }
+    e.insert(c.ultim->getinfo());
+    return e;
+}
+
+class deque: public coada{
+public:    
+    deque(){
+       dim_max=0;
+       size=0;
+       prim=NULL;
+       ultim=NULL;
+    }
+    deque(int i,nod* n){
+       dim_max=i;
+       size=1;
+       prim=n;
+       ultim=n;
+    }
+    deque(int i,nod* n,nod* m){
+       dim_max=i;
+       size=2;
+       prim=n;
+       ultim=m;
+    }
+    deque(const deque &obj){
+        prim=NULL;
+        ultim=NULL;
+        size=0;
+        dim_max=obj.dim_max;
+        nod* p=obj.prim;
+        while(p!=NULL)
+            {insert(p->getinfo());
+            p=p->getnext();}
+    }
+    ~deque(){}
+    void popright(){
+        try{
+            if(ultim==NULL)
+                throw 2;
+            delete ultim;   
+        }
+        catch(int i){
+            cout<<"Exceptie "<<i<<":Ultimul element nu exista";
+        }
+    }
+    void insertleft(char* x){
+        try{
+            if(size==dim_max)
+                throw 4;
+            nod*Y;
+            Y=new nod(x,NULL);
+            Y->setnext(prim);
+            prim=Y;
+            size++;
+        }
+        catch(int i){
+            cout<<"Exceptie "<<i<<":A fost atinsa limita de alocare.Nu mai poti insera";
+        }
+    }
+    deque operator =(deque d);
+}; 
+deque deque::operator =(deque d){
+    deque e(d.dim_max,d.prim);
+    nod *n;
+    e.dim_max=d.dim_max;
+    e.size=d.size;
+    if(d.prim->getnext()!=NULL)
+        n=d.prim->getnext();
+    while(n!=d.ultim){
+        e.insert(n->getinfo());
+        n=n->getnext();
+    }
+    e.insert(d.ultim->getinfo());
+    return e;
+} 
+
+class deque_marcaj:public deque{
+public:
+    deque_marcaj(){
+       dim_max=0;
+       size=0;
+       prim=NULL;
+       ultim=NULL;
+    }
+    deque_marcaj(int i,nod* n){
+       dim_max=i;
+       size=1;
+       prim=n;
+       ultim=n;
+    }
+    deque_marcaj(int i,nod* n,nod* m){
+       dim_max=i;
+       size=2;
+       prim=n;
+       ultim=m;
+    }
+    deque_marcaj(const deque_marcaj &obj){
+        prim=NULL;
+        ultim=NULL;
+        size=0;
+        dim_max=obj.dim_max;
+        nod* p=obj.prim;
+        while(p!=NULL)
+            {insert(p->getinfo());
+            p=p->getnext();}
+    }
+    ~deque_marcaj(){}
+    deque_marcaj operator =(deque_marcaj dm);
+    void insert_at(char* x,int i){
+        try{
+            if(size==dim_max)
+                throw 4;
+            if (prim==NULL) {
+        		prim=ultim =new nod(x, NULL);
+        		size=1;
+        		return;
+        	}
+        	nod*p=new nod(x, NULL);
+        	if (i==0) {
+        	    insertleft(x);
+        		return;
+        	}
+        	if(i<0||i>size){
+        	    throw "out";
+        	}
+        	if(i==size){
+        	    insert(x);
+        	    return;
+        	}
+        	nod*o=prim;
+        	for (int j=1;j<i;j++) {
+        		o=o->getnext();
+        	}
+        	p->setnext(o->getnext()); 
+        	o->setnext(p);
+        	size++;
+        }
+        catch(int i){
+            cout<<"Exceptie "<<i<<":A fost atinsa limita de alocare.Nu mai poti insera";
+        }
+        catch(char const* i){
+            cout<<"Exceptie "<<i<<":Indexul dat este out of range"; 
+        }
+    }
+    void sterge(int i){
+        try{
+            if(prim==NULL){
+                throw "empty";
+            }
+        	if (i<0||i>=size) 
+        		throw 3;
+        	if(i==size-1){
+        	    popright();
+        	    return;
+        	}
+        	if(i==0){
+        	    pop();
+        	    return;
+        	}
+        	nod*p=prim;
+        	if (i==0)
+        		if (size==1||size==0)
+        			ultim=prim=NULL;
+        		else{
+        			ultim=prim->getnext();
+        			delete p;
+        	        }
+        	else{
+        		for (int j=1;j<i;j++)
+        			p=p->getnext();
+        		nod*o=p->getnext();
+        		p->setnext(o->getnext());
+        		delete o;
+        	    }
+        	size--;
+        }
+        catch(int i){
+            cout<<"Exceptie "<<i<<":Indexul dat este out of range";
+        }
+        catch(char const* i){
+            cout<<"Exceptie "<<i<<":Nu mai ai ce sterge.Lista e goala.";
+        }
+    }
+};    
+deque_marcaj deque_marcaj::operator =(deque_marcaj dm){
+    deque_marcaj e(dm.dim_max,dm.prim);
+    nod *n;
+    e.dim_max=dm.dim_max;
+    e.size=dm.size;
+    if(dm.prim->getnext()!=NULL)
+        n=dm.prim->getnext();
+    while(n!=dm.ultim){
+        e.insert(n->getinfo());
+        n=n->getnext();
+    }
+    e.insert(dm.ultim->getinfo());
+    return e;
+}     
+int main()
+{
+return 0;
+}

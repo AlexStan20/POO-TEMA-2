@@ -176,24 +176,9 @@ coada coada::operator =(coada c){
 
 class deque: public coada{
 public:    
-    deque(){
-       dim_max=0;
-       size=0;
-       prim=NULL;
-       ultim=NULL;
-    }
-    deque(int i,nod* n){
-       dim_max=i;
-       size=1;
-       prim=n;
-       ultim=n;
-    }
-    deque(int i,nod* n,nod* m){
-       dim_max=i;
-       size=2;
-       prim=n;
-       ultim=m;
-    }
+    deque():coada(){}
+    deque(int i,nod* n):coada(i,n){}
+    deque(int i,nod* n,nod* m):coada(i,n,m){}
     deque(const deque &obj){
         prim=NULL;
         ultim=NULL;
@@ -248,24 +233,9 @@ deque deque::operator =(deque d){
 
 class deque_marcaj:public deque{
 public:
-    deque_marcaj(){
-       dim_max=0;
-       size=0;
-       prim=NULL;
-       ultim=NULL;
-    }
-    deque_marcaj(int i,nod* n){
-       dim_max=i;
-       size=1;
-       prim=n;
-       ultim=n;
-    }
-    deque_marcaj(int i,nod* n,nod* m){
-       dim_max=i;
-       size=2;
-       prim=n;
-       ultim=m;
-    }
+    deque_marcaj():deque(){}
+    deque_marcaj(int i,nod* n):deque(i,n){}
+    deque_marcaj(int i,nod* n,nod* m):deque(i,n,m){}
     deque_marcaj(const deque_marcaj &obj){
         prim=NULL;
         ultim=NULL;
